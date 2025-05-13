@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分析结果 - {{ result.get('文件名', 'N/A') }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>专利文档分析报告</h1>
+        <p><a href="{{ url_for('index') }}">返回上传页面</a></p>
+
+        <div class="result-section">
+            <h2>基本信息</h2>
+            <p><strong>文件名:</strong> {{ result.get('文件名', 'N/A') }}</p>
+            <p><strong>统计模式:</strong> {{ result.get('统计模式', 'N/A') }}</p>
+            <p><strong>总字数:</strong> {{ result.get('总字数', 'N/A') }}</p>
+            <p><strong>配置来源:</strong> {{ result.get('config_source', 'N/A') }}</p>
+        </div>
+
+        <div class="result-section">
+            <h2>各部分字数统计</h2>
+            {% if result.get('各部分') %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>章节名称</th>
+                            <th>原文识别标题</th>
+                            <th>字数</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for section, data in result.get('各部分', {}).items()|sort %}
+                        <tr>
+                            <td>{{ section }}</td>
+                            <td>{{ data.get('原始内容标题', section) }}</td>
+                            <td>{{ data.get('字数', 'N/A') }}</td>
+                            <td>{% if data.get('聚合字数') %}由子部分聚合: {{ data.get('包含子部分', [])|join(', ') }}{% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>未能识别并提取任何特定章节。</p>
+            {% endif %}
+        </div>
+
+        <div class="result-section">
+            <h2>字数要求检查</h2>
+            {% if result.get('检查结果') %}
+                <ul>
+                {% for item in result.get('检查结果', [])|sort(attribute='name') %}
+                    {# 在这里正确设置 status_class #}
+                    {% set status_class = 'status-info' %} {# Default for info #}
+                    {% if item.get('status_bool') == True %}
+                        {% set status_class = 'status-ok' %}
+                    {% elif item.get('status_bool') == False %}
+                        {% set status_class = 'status-fail' %}
+                    {% elif item.get('status_str') == '未识别' or (item.get('status_str') and '未识别' in item.get('status_str', '')) %}
+                        {% set status_class = 'status-warn' %}
+                    {% elif item.get('status_str') and item.get('status_str') != '信息' %} {# If status_str exists and is not '信息', assume fail-like #}
+                        {% set status_class = 'status-fail' %}
+                    {% endif %}
+
+                    <li class="check-item {{ status_class }}">
+                        <strong>{{ item.get('name', 'N/A') }}:</strong> {{ item.get('message', '无消息') }}
+                        <br>
+                        <small>
+                            实际: {{ item.get('actual', 'N/A') }}
+                            {% if item.get('expected_str') %} | 目标: {{ item.get('expected_str', 'N/A') }} {% endif %}
+                        </small>
+                    </li>
+                {% endfor %} {# 这个 for 循环的结束标签在这里 #}
+                </ul>
+            {% else %}
+                <p>没有配置或执行任何字数要求检查。</p>
+            {% endif %} {# 这个 if result.get('检查结果') 的结束标签在这里 #}
+        </div>
+
+        <div class="result-section">
+            <h2>应用的配置详情</h2>
+            <pre class="config-display">{{ result.get('applied_config', {}) | toyaml(indent=2, sort_keys=False) }}</pre>
+        </div>
+
+        <div class="result-section">
+            <h2>复制粘贴给大模型的纯文本报告</h2>
+            <p>您可以复制以下文本框中的内容，直接粘贴给大模型，以提供准确的字数信息。</p>
+            <textarea id="plainTextReport" rows="20" readonly>{{ result.get('plain_text_report', '未能生成纯文本报告。') }}</textarea>
+            <button onclick="copyReportToClipboard()">复制到剪贴板</button>
+            <p id="copyStatus" style="display:none; color: green; margin-top: 5px;"></p>
+        </div>
+
+    </div> {# end .container #}
+
+    <script>
+    function copyReportToClipboard() {
+        var textArea = document.getElementById("plainTextReport");
+        var statusP = document.getElementById("copyStatus");
+
+        if (!navigator.clipboard) {
+            // Fallback for older browsers
+            try {
+                textArea.select();
+                textArea.setSelectionRange(0, 99999); // For mobile devices
+                var successful = document.execCommand('copy');
+                var msg = successful ? '报告已成功复制到剪贴板！ (旧版方式)' : '复制失败。请手动复制。';
+                statusP.textContent = msg;
+                statusP.style.color = successful ? "green" : "red";
+            } catch (err) {
+                statusP.textContent = '浏览器不支持自动复制，请手动复制。';
+                statusP.style.color = "red";
+            }
+            statusP.style.display = "inline";
+            setTimeout(function(){ statusP.style.display = "none"; }, 3000);
+            return;
+        }
+
+        // Modern clipboard API
+        navigator.clipboard.writeText(textArea.value).then(function() {
+            statusP.textContent = '报告已成功复制到剪贴板！';
+            statusP.style.color = "green";
+            statusP.style.display = "inline";
+            setTimeout(function(){ statusP.style.display = "none"; }, 3000);
+        }, function(err) {
+            statusP.textContent = '复制失败: ' + err + '请手动复制。';
+            statusP.style.color = "red";
+            statusP.style.display = "inline";
+            setTimeout(function(){ statusP.style.display = "none"; }, 5000);
+        });
+    }
+    </script>
+
+</body>
+</html>

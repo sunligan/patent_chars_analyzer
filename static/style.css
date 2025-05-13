@@ -1,0 +1,172 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    max-width: 900px;
+    margin: auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    color: #333;
+    margin-bottom: 0.8em;
+}
+h1 {
+    text-align: center;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5em;
+}
+
+.form-group {
+    margin-bottom: 1.5em;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: .5em;
+    font-weight: bold;
+}
+
+.form-group input[type="file"],
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box; /* Important */
+}
+.form-group textarea {
+    min-height: 150px;
+    font-family: Consolas, monaco, monospace;
+    font-size: 0.9em;
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.2s ease-in-out;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.flashes {
+    list-style-type: none;
+    padding: 0;
+    margin-bottom: 1em;
+}
+.flashes li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+.flashes li.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;}
+.flashes li.warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;}
+.flashes li.info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;}
+.flashes li.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;}
+
+
+.result-section {
+    margin-top: 2em;
+    padding-top: 1.5em;
+    border-top: 1px solid #eee;
+}
+.result-section h2 {
+    margin-top: 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1em;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #f0f0f0;
+}
+
+.check-item {
+    list-style-type: none;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-left-width: 5px;
+    border-left-style: solid;
+    border-radius: 3px;
+    background-color: #f9f9f9;
+}
+.check-item strong { display: block; margin-bottom: 3px;}
+.check-item small { color: #555; font-size: 0.9em;}
+
+.status-ok { border-left-color: #28a745; /* Green */ }
+.status-fail { border-left-color: #dc3545; /* Red */ }
+.status-warn { border-left-color: #ffc107; /* Yellow */ }
+.status-info { border-left-color: #17a2b8; /* Teal */ }
+
+pre.config-display {
+    background-color: #e9ecef;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.9em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+textarea#plainTextReport {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: Consolas, monaco, monospace; /* 等宽字体方便阅读 */
+    font-size: 0.9em;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 10px; /* Add some space below textarea */
+}
+
+button[onclick="copyReportToClipboard()"] {
+    display: inline-block;
+    width: auto;
+    padding: 8px 15px;
+    /* margin-top: 10px; */ /* Removed as textarea now has margin-bottom */
+    background-color: #28a745; /* Green */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+button[onclick="copyReportToClipboard()"]:hover {
+    background-color: #218838;
+}
+
+#copyStatus { /* Style for the copy status message */
+    margin-left: 10px;
+    font-size: 0.9em;
+    font-style: italic;
+}

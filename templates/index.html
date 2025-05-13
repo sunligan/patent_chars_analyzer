@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专利文档分析工具</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>专利文档分析与字数检查</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class=flashes>
+            {% for category, message in messages %}
+              <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="patent_file">1. 上传专利文件 (.txt 或 .docx):</label>
+                <input type="file" name="patent_file" id="patent_file" required>
+            </div>
+
+            <div class="form-group">
+                <label for="count_mode">2.选择字数统计模式:</label>
+                <select name="count_mode" id="count_mode">
+                    <option value="chinese" selected>仅中文字符 (默认)</option>
+                    <option value="word">类Word统计 (中文+英文单词+数字)</option>
+                    <option value="all">所有非空白字符</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="config_file">3. (可选) 上传自定义字数要求配置文件 (.yaml):</label>
+                <input type="file" name="config_file" id="config_file">
+                <small>如果同时提供了下方文本框配置，以上传文件为准。</small>
+            </div>
+
+            <div class="form-group">
+                <label for="custom_config_text">4. (可选) 或在下方粘贴/编辑 YAML 配置内容:</label>
+                <textarea name="custom_config_text" id="custom_config_text" rows="15" placeholder="在此处粘贴或编辑YAML格式的配置...">{{ default_config_str }}</textarea>
+                <small>如果留空且未上传配置文件，将使用默认配置。</small>
+            </div>
+
+            <button type="submit">开始分析</button>
+        </form>
+    </div>
+</body>
+</html>
